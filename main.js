@@ -1,37 +1,79 @@
 /* globals fetch, moment */
 const url = 'http://localhost:3000/notes'
-document.addEventListener("submit", function (event){
-    event.preventDefault()
-    const noteInput = document.querySelector("#note-input").value
-    console.log(noteInput)
+const noteList = document.querySelector('#note-list')
 
-    fetch(url, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ 
-            noteItem: noteInput,  
-            created_at: moment().format() 
-        
-        })
-    })
-     .then(res => res.json())
-     .then(data => {
-         const noteList = document.querySelector("#note-list")
-         const noteItemEl = document.createElement("li")
-         noteItemEl.innerText = data.noteItem
-            noteList.appendChild(noteItemEl)
-
-     })   
+document.addEventListener('submit', function (event) {
+  event.preventDefault()
+  createNote()
 })
 
-fetch(url)
+noteList.addEventListener('click', function (e) {
+  if (e.target.matches('.delete')) {
+    deleteNote(e.target.parentElement.dataset.id)
+  }
+})
+
+function renderNoteList () {
+  fetch(url)
     .then(res => res.json())
     .then(noteData => {
-        const noteList = document.querySelector('#note-list')
-        for (const item of noteData) {
-            console.log(item)
-            const noteItemEl = document.createElement('li')
-            noteItemEl.innerText = item.noteItem
-            noteList.appendChild(noteItemEl)
-        }
+      for (const note of noteData) {
+        renderTodoItem(note)
+      }
     })
+}
+
+function renderNoteItem (note) {
+  const noteList = document.querySelector('#note-list')
+  const noteItemEl = document.createElement('li')
+  noteItemEl.dataset.id = note.id
+  noteItemEl.id = `item-${note.id}`
+  noteItemEl.innerText = note.noteItem
+  const deleteIcon = document.createElement('span')
+  deleteIcon.classList.add('fas', 'fa-minus-circle', 'mar-l-xs', 'delete')
+  noteItemEl.appendChild(deleteIcon)
+  noteList.appendChild(noteItemEl)
+}
+
+function createNote () {
+  const noteInputField = document.querySelector('#note-input')
+
+  const requestData = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      noteItem: noteInputField.value,
+      created_at: moment().format()
+    })
+  }
+
+  fetch(url, requestData)
+    .then(res => res.json())
+    .then(data => {
+      noteInputField.value = ''
+      renderNoteItem(data)
+    })
+}
+
+function deleteNote (noteId) {
+  fetch(url + '/' + noteId, {
+    method: 'DELETE'
+  })
+    .then(res => res.json())
+    .then(data => {
+      const itemToRemove = document.querySelector(`#item-${noteId}`)
+      itemToRemove.remove()
+    })
+}
+
+
+    
+
+
+    //creating a delete button on each note-list
+    //const deleteButton = document.createElement("button")
+    //deleteButton.innerText = "Delete"
+
+    //deleteButton.addEventListener("click", function () {
+        //deleteNoteItemEl(notelist.id)
+    //})
