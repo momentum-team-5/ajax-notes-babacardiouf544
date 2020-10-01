@@ -29,6 +29,7 @@ function renderNoteItem (note) {
   noteItemEl.dataset.id = note.id
   noteItemEl.id = `item-${note.id}`
   noteItemEl.innerText = note.noteItem
+  // create the delete icom (minus circle) and put on created note 
   const deleteIcon = document.createElement('span')
   deleteIcon.classList.add('fas', 'fa-minus-circle', 'mar-l-xs', 'delete')
   noteItemEl.appendChild(deleteIcon)
@@ -70,10 +71,4 @@ function deleteNote (noteId) {
     
 
 
-    //creating a delete button on each note-list
-    //const deleteButton = document.createElement("button")
-    //deleteButton.innerText = "Delete"
-
-    //deleteButton.addEventListener("click", function () {
-        //deleteNoteItemEl(notelist.id)
-    //})
+    
